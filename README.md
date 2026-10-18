@@ -1,55 +1,53 @@
 # spotify-album-importer
 
-Guarda na tua biblioteca do Spotify os álbuns de uma lista em CSV. O que não existir no catálogo do Spotify é ignorado e fica listado num relatório. Só usa a biblioteca padrão do Python 3, sem dependências.
+Saves the albums listed in a CSV file to your Spotify library. Anything not found in the Spotify catalog is skipped and listed in a report. Uses only the Python 3 standard library, no dependencies.
 
-*Saves the albums listed in a CSV (`artista,album`) to your Spotify library; anything not found is skipped and reported.*
-
-## Formato do CSV
+## CSV format
 
 ```csv
-artista,album
+artist,album
 Pink Floyd,The Wall
 Tool,Ænima
 Queen,
 ```
 
-Uma linha sem álbum (como `Queen,`) só é usada com `--seguir-artistas`, que segue o artista.
+A row without an album (like `Queen,`) is only used with `--follow-artists`, which follows the artist.
 
-## Passos
+## Steps
 
-1. **Cria uma app no Spotify.** Vai a <https://developer.spotify.com/dashboard>, clica em *Create app* e preenche o nome e a descrição.
-2. **Redirect URI:** `http://127.0.0.1:8888/callback`. Tem de ser exatamente isto, com `127.0.0.1` e não `localhost`.
-3. **API:** escolhe apenas *Web API*, aceita os termos e guarda.
-4. **Copia o Client ID** da app (em *Settings*). O Client ID não é secreto e este script não usa o Client Secret.
-5. **Testa primeiro, sem guardar nada:**
+1. **Create a Spotify app.** Go to <https://developer.spotify.com/dashboard>, click *Create app* and fill in the name and description.
+2. **Redirect URI:** `http://127.0.0.1:8888/callback`. It must be exactly this, with `127.0.0.1` and not `localhost`.
+3. **API:** select only *Web API*, accept the terms and save.
+4. **Copy the Client ID** from the app's *Settings*. The Client ID is not secret and this script does not use the Client Secret.
+5. **Dry run first, saving nothing:**
    ```
-   python3 spotify_album_importer.py exemplo.csv --client-id O_TEU_CLIENT_ID --teste
+   python3 spotify_album_importer.py example.csv --client-id YOUR_CLIENT_ID --dry-run
    ```
-   O browser abre para autorizares. No fim, vê o `relatorio_spotify.txt` e confirma que os álbuns encontrados são os que queres. As correspondências são aproximadas e podem escolher uma edição diferente (deluxe, remaster) ou, raramente, um álbum errado.
-6. **Corre a sério,** sem `--teste`:
+   The browser opens so you can authorize. When it finishes, open `spotify_report.txt` and check that the albums found are the ones you want. Matching is approximate and may pick a different edition (deluxe, remaster) or, rarely, the wrong album.
+6. **Run for real,** without `--dry-run`:
    ```
-   python3 spotify_album_importer.py a_minha_lista.csv --client-id O_TEU_CLIENT_ID
+   python3 spotify_album_importer.py my_list.csv --client-id YOUR_CLIENT_ID
    ```
-   Acrescenta `--seguir-artistas` para seguir também os artistas das linhas sem álbum.
+   Add `--follow-artists` to also follow the artists on rows without an album.
 
-Em vez de `--client-id` podes definir a variável de ambiente `SPOTIFY_CLIENT_ID`.
+Instead of `--client-id` you can set the `SPOTIFY_CLIENT_ID` environment variable.
 
-## Opções
+## Options
 
-| Opção | O que faz |
+| Option | What it does |
 |---|---|
-| `--client-id` | Client ID da tua app (ou `SPOTIFY_CLIENT_ID`) |
-| `--teste` | Só procura e escreve o relatório, não altera a tua conta |
-| `--seguir-artistas` | Segue os artistas das linhas sem álbum |
-| `--relatorio` | Caminho do relatório (por omissão `relatorio_spotify.txt`) |
+| `--client-id` | Client ID of your app (or `SPOTIFY_CLIENT_ID`) |
+| `--dry-run` | Only searches and writes the report, does not change your account |
+| `--follow-artists` | Follows the artists on rows without an album |
+| `--report` | Report path (default `spotify_report.txt`) |
 
-## Notas
+## Notes
 
-- O login usa o fluxo OAuth com PKCE. O token só existe em memória durante a execução e não é guardado em disco.
-- Se a app estiver em *development mode*, só as contas que adicionares em *User Management* podem autorizá-la.
-- O script usa o endpoint `PUT /me/library` e, se a tua app o recusar, o antigo `PUT /me/albums`. A API do Spotify mudou recentemente e pode voltar a mudar.
-- Para passar a biblioteca para o Apple Music, ferramentas como o Soundiiz fazem a transferência entre serviços. Não está testado aqui.
+- Login uses the OAuth PKCE flow. The token only exists in memory while the script runs and is never written to disk.
+- If your app is in *development mode*, only accounts you add under *User Management* can authorize it.
+- The script uses `PUT /me/library` and, if your app rejects it, falls back to the older `PUT /me/albums`. Spotify's API has changed recently and may change again.
+- To move your library to Apple Music, services like Soundiiz can transfer between platforms. Not tested here.
 
-## Licença
+## License
 
 MIT
